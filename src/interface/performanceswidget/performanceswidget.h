@@ -8,10 +8,11 @@ class PerformancesWidget : public QWidget {
 
     public:
     explicit PerformancesWidget(QWidget* parent = nullptr);
-    void clean();
 
     signals:
     void change_parent_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_PERFORMANCESWIDGET_PERFORMANCESWIDGET_H

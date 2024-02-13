@@ -12,8 +12,6 @@ class ProfileWidget : public QWidget {
 
     public:
     explicit ProfileWidget(QWidget *parent = nullptr);
-    void clean();
-    void set_player(const QString& player_id);
 
     private:
     QStackedLayout* layout;
@@ -22,9 +20,12 @@ class ProfileWidget : public QWidget {
 
     public slots:
     void change_page(int index);
+    void set_player(const QString& player_id);
+    void clean();
 
     signals:
     void change_parent_page(int index);
+
 };
 
 #endif // INTERFACE_PROFILEWIDGET_PROFILEWIDGET_H

@@ -2,9 +2,13 @@
 #include <QSqlRecord>
 #include <QSqlError>
 #include <QStringList>
+#include <QSqlDatabase>
+#include <QVariantList>
+#include "../controllers/initdb.h"
 #include "general.h"
 
-bool createTableRow(const QString& table_name, const QHash<QString,QVariant>& fields) {
+int createTableRow(const QString& table_name, const QHash<QString,QVariant>& fields) {
+    QSqlDatabase db = getDB();
     QSqlQuery query;
     QStringList field_names;
     for (auto it = fields.begin(); it != fields.end(); ++it) {
@@ -14,11 +18,19 @@ bool createTableRow(const QString& table_name, const QHash<QString,QVariant>& fi
     for (auto it = fields.begin(); it != fields.end(); ++it) {
         query.bindValue(":" + it.key(), it.value());
     }
-    return query.exec();
+
+    int row_id = -1;
+    if (query.exec()) {
+        row_id = query.lastInsertId().toInt();
+    }
+
+    db.close();
+    return row_id;
 }
 
 
-bool setTableRowFields(const QString& table_name, const QString& row_id, const QHash<QString,QVariant>& fields) {
+bool setTableRowFields(const QString& table_name, int row_id, const QHash<QString,QVariant>& fields) {
+    QSqlDatabase db = getDB();
     QSqlQuery query;
     QStringList field_names;
     for (auto it = fields.begin(); it != fields.end(); ++it) {
@@ -29,11 +41,14 @@ bool setTableRowFields(const QString& table_name, const QString& row_id, const Q
         query.bindValue(":" + it.key(), it.value());
     }
     query.bindValue(":id", row_id);
-    return query.exec();
+    bool success = query.exec();
+    db.close();
+    return success;
 }
 
 
-QHash<QString,QVariant> getTableRow(const QString& table_name, const QString& row_id, const QStringList& fields) {
+QHash<QString,QVariant> getTableRow(const QString& table_name, int row_id, const QStringList& fields) {
+    QSqlDatabase db = getDB();
     QSqlQuery query;
     QStringList field_names;
     if (fields.isEmpty()) {
@@ -59,11 +74,13 @@ QHash<QString,QVariant> getTableRow(const QString& table_name, const QString& ro
     } else {
         row["error"] = query.lastError().text();
     }
+    db.close();
     return row;
 }
 
 
-QHash<QString,QHash<QString,QVariant>> getTableRows(const QString& table_name,const QHash<QString,QVariant>& filters, const QStringList& fields) {
+QHash<QString,QVariant> getTableRow(const QString& table_name, const QHash<QString,QVariant>& filters, const QStringList& fields) {
+    QSqlDatabase db = getDB();
     QSqlQuery query;
     QStringList field_names;
     if (fields.isEmpty()) {
@@ -82,7 +99,44 @@ QHash<QString,QHash<QString,QVariant>> getTableRows(const QString& table_name,co
         query.bindValue(":" + it.key(), it.value());
     }
 
-    QHash<QString,QHash<QString,QVariant>> rows;
+    QHash<QString,QVariant> row;
+    if(query.exec()){
+        if (!fields.isEmpty()){
+            for (auto it = field_names.begin(); it != field_names.end(); ++it) {
+                row[*it] = query.value(*it);
+            }
+        } else {
+            for (int i = 0; i < query.record().count(); ++i) {
+                row[query.record().fieldName(i)] = query.value(i);
+            }
+        }
+    } else {
+        row["error"] = query.lastError().text();
+    }
+    db.close();
+    return row;
+}
+
+
+QHash<int,QHash<QString,QVariant>> getTableRows(const QString& table_name, const QVector<int>& row_ids, const QStringList& fields){
+    QSqlDatabase db = getDB();
+    QSqlQuery query;
+
+    QStringList field_names;
+    if (fields.isEmpty()) {
+        field_names << "*";
+    } else {
+        field_names = fields;
+    }
+    QVariantList ids;
+    for (int id : row_ids) {
+        ids << id;
+    }
+
+    query.prepare("SELECT " + field_names.join(", ") + " FROM " + table_name + " WHERE id IN (:ids)");
+    query.bindValue(":ids",ids);
+
+    QHash<int,QHash<QString,QVariant>> rows;
     if(query.exec()){
         while (query.next()) {
             QHash<QString,QVariant> row;
@@ -95,26 +149,161 @@ QHash<QString,QHash<QString,QVariant>> getTableRows(const QString& table_name,co
                     row[query.record().fieldName(i)] = query.value(i);
                 }
             }
-            rows[query.value("id").toString()] = row;
+            rows[query.value("id").toInt()] = row;
         }
     } else {
         QHash<QString,QVariant> row;
         row["error"] = query.lastError().text();
-        rows["error"] = row;
+        rows[-1] = row;
     }
+
+    db.close();
     return rows;
 }
 
 
-bool deleteTableRow(const QString& table_name, const QString& row_id) {
+QHash<int,QHash<QString,QVariant>> getTableRows(const QString& table_name,const QHash<QString,QVariant>& filters, const QStringList& fields) {
+    QSqlDatabase db = getDB();
+    QSqlQuery query;
+    QStringList field_names;
+    if (fields.isEmpty()) {
+        field_names << "*";
+    } else {
+        field_names = fields;
+    }
+
+    QStringList filter_names;
+    for (auto it = filters.begin(); it != filters.end(); ++it) {
+        filter_names << it.key() + " = :" + it.key();
+    }
+
+    query.prepare("SELECT " + field_names.join(", ") + " FROM " + table_name + " WHERE " + filter_names.join(" AND "));
+    for (auto it = filters.begin(); it != filters.end(); ++it) {
+        query.bindValue(":" + it.key(), it.value());
+    }
+
+    QHash<int,QHash<QString,QVariant>> rows;
+    if(query.exec()){
+        while (query.next()) {
+            QHash<QString,QVariant> row;
+            if (!fields.isEmpty()){
+                for (auto it = field_names.begin(); it != field_names.end(); ++it) {
+                    row[*it] = query.value(*it);
+                }
+            } else {
+                for (int i = 0; i < query.record().count(); ++i) {
+                    row[query.record().fieldName(i)] = query.value(i);
+                }
+            }
+            rows[query.value("id").toInt()] = row;
+        }
+    } else {
+        QHash<QString,QVariant> row;
+        row["error"] = query.lastError().text();
+        rows[-1] = row;
+    }
+
+    db.close();
+    return rows;
+}
+
+
+QVector<QHash<QString,QVariant>> getTableOrderedRows(const QString& table_name, const QString& order_by, const QHash<QString,QVariant>& filters, const QStringList& fields,const QString& order){
+    QSqlDatabase db = getDB();
+    QSqlQuery query;
+    QStringList field_names;
+    if (fields.isEmpty()) {
+        field_names << "*";
+    } else {
+        field_names = fields;
+    }
+
+    QStringList filter_names;
+    for (auto it = filters.begin(); it != filters.end(); ++it) {
+        filter_names << it.key() + " = :" + it.key();
+    }
+
+    query.prepare("SELECT " + field_names.join(", ") + " FROM " + table_name + " WHERE " + filter_names.join(" AND ") + " ORDER BY " + order_by + " " + order);
+    for (auto it = filters.begin(); it != filters.end(); ++it) {
+        query.bindValue(":" + it.key(), it.value());
+    }
+
+    QVector<QHash<QString,QVariant>> rows;
+    if(query.exec()){
+        while (query.next()) {
+            QHash<QString,QVariant> row;
+            if (!fields.isEmpty()){
+                for (auto it = field_names.begin(); it != field_names.end(); ++it) {
+                    row[*it] = query.value(*it);
+                }
+            } else {
+                for (int i = 0; i < query.record().count(); ++i) {
+                    row[query.record().fieldName(i)] = query.value(i);
+                }
+            }
+            rows.append(row);
+        }
+    } else {
+        QHash<QString,QVariant> row;
+        row["error"] = query.lastError().text();
+        rows.append(row);
+    }
+    db.close();
+    return rows;
+}
+
+
+QHash<int,QHash<QString,QVariant>> getTableRowsPartialFilter(const QString& table_name, const QString& filter_name, const QString& value, const QStringList& fields) {
+    QSqlDatabase db = getDB();
+    QSqlQuery query;
+    QStringList field_names;
+    if (fields.isEmpty()) {
+        field_names << "*";
+    } else {
+        field_names = fields;
+    }
+
+    query.prepare("SELECT " + field_names.join(", ") + " FROM " + table_name + " WHERE " + filter_name + " LIKE :value");
+    query.bindValue(":value", "%" + value + "%");
+
+    QHash<int,QHash<QString,QVariant>> rows;
+    if(query.exec()){
+        while (query.next()) {
+            QHash<QString,QVariant> row;
+            if (!fields.isEmpty()){
+                for (auto it = field_names.begin(); it != field_names.end(); ++it) {
+                    row[*it] = query.value(*it);
+                }
+            } else {
+                for (int i = 0; i < query.record().count(); ++i) {
+                    row[query.record().fieldName(i)] = query.value(i);
+                }
+            }
+            rows[query.value("id").toInt()] = row;
+        }
+    } else {
+        QHash<QString,QVariant> row;
+        row["error"] = query.lastError().text();
+        rows[-1] = row;
+    }
+    db.close();
+    return rows;
+}
+
+
+bool deleteTableRow(const QString& table_name, int row_id) {
+    QSqlDatabase db = getDB();
     QSqlQuery query;
     query.prepare("DELETE FROM " + table_name + " WHERE id = :id");
     query.bindValue(":id", row_id);
-    return query.exec();
+    bool success = query.exec();
+    db.close();
+    return success;
 }
 
 
 bool deleteTableRows(const QString& table_name, const QHash<QString,QVariant>& filters) {
+    QSqlDatabase db = getDB();
     QSqlQuery query;
     QStringList filter_names;
     for (auto it = filters.begin(); it != filters.end(); ++it) {
@@ -124,5 +313,7 @@ bool deleteTableRows(const QString& table_name, const QHash<QString,QVariant>& f
     for (auto it = filters.begin(); it != filters.end(); ++it) {
         query.bindValue(":" + it.key(), it.value());
     }
-    return query.exec();
+    bool success = query.exec();
+    db.close();
+    return success;
 }

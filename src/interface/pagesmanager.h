@@ -16,7 +16,6 @@ class PagesManager : public QWidget {
 
     public:
     explicit PagesManager(QWidget* parent=nullptr);
-    void clean();
 
     private:
     QStackedLayout* layout;
@@ -30,6 +29,8 @@ class PagesManager : public QWidget {
 
     public slots:
     void change_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_PAGESMANAGER_H

@@ -8,10 +8,11 @@ class HistoryWidget : public QWidget {
 
     public:
     explicit HistoryWidget(QWidget* parent = nullptr);
-    void clean();
 
     signals:
     void change_parent_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_HISTORYWIDGET_HISTORYWIDGET_H

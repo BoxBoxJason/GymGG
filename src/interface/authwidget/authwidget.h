@@ -11,7 +11,6 @@ class AuthWidget : public QWidget {
 
     public:
     explicit AuthWidget(QWidget *parent = nullptr);
-    void clean();
 
     private:
     QStackedLayout* stacked_layout;
@@ -24,6 +23,8 @@ class AuthWidget : public QWidget {
 
     signals:
     void change_parent_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_AUTHWIDGET_AUTHWIDGET_H

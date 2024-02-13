@@ -10,7 +10,6 @@ class LoginWidget : public QWidget {
 
     public:
     explicit LoginWidget(QWidget *parent = nullptr);
-    void clean();
 
     private:
 
@@ -21,6 +20,7 @@ class LoginWidget : public QWidget {
     signals:
     void login_success(const QString& user_id);
     void change_parent_page();
+    void clean();
 
 };
 

@@ -8,10 +8,11 @@ class ExercisesWidget : public QWidget {
 
     public:
     explicit ExercisesWidget(QWidget* parent = nullptr);
-    void clean();
 
     signals:
     void change_parent_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_EXERCISESWIDGET_EXERCISESWIDGET_H

@@ -9,10 +9,12 @@ class TrainingsCounterWidget : public QWidget {
 
     public:
     explicit TrainingsCounterWidget(QWidget *parent = nullptr);
-    void setTrainingsCounter(const QJsonObject& trainings_counter);
-    void clean();
 
     private:
+
+    public slots:
+    void clean();
+    void setTrainingsCounter(const QJsonObject& trainings_counter);
 
 };
 

@@ -26,6 +26,7 @@ bool createTables(){
                   "username TEXT UNIQUE NOT NULL,"
                   "email TEXT UNIQUE NOT NULL,"
                   "password TEXT NOT NULL,"
+                  "salt TEXT NOT NULL," // for password hashing
                   "birthdate DATE NOT NULL,"
                   "weights TEXT DEFAULT '{}'," // stringified json object {created_at: weight (kg)}
                   "height INTEGER," // in cm
@@ -41,10 +42,10 @@ bool createTables(){
     if (creation_success){
         query.prepare("CREATE TABLE IF NOT EXISTS Exercises ("
                       "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                      "name TEXT UNIQUE DEFAULT 'Workout',"
-                      "description TEXT DEFAULT 'empty',"
+                      "name TEXT UNIQUE NOT NULL,"
+                      "description TEXT,"
                       "type TEXT DEFAULT 'unspecified'," // strength, cardio, flexibility, etc.
-                      "notes TEXT DEFAULT '',"
+                      "notes TEXT,"
                       "muscles TEXT DEFAULT 'none'," // stringified list of muscles separated by comma (no spaces)
                       "equipments TEXT DEFAULT 'none'," // stringified list of equipments separated by comma (no spaces)
                       "icon TEXT DEFAULT 'default.png'" // icon file name
@@ -63,6 +64,9 @@ bool createTables(){
                       "notes TEXT,"
                       "type TEXT DEFAULT 'unspecified',"
                       "exercises TEXT NOT NULL DEFAULT '{}'," // stringified json object {exercise_id: {number_of_sets: number_of_reps}}
+                      "icon TEXT DEFAULT 'default.png',"
+                      "user_id INTEGER NOT NULL," // user who created the template
+                      "FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE"
                       ");");
         if (!query.exec()){
             creation_success = false;
@@ -80,6 +84,7 @@ bool createTables(){
                       "notes TEXT,"
                       "user_id INTEGER NOT NULL," // user who performed the workout
                       "template_id INTEGER," // template used for the workout
+                      "completed BOOLEAN DEFAULT 0," // 0 for false, 1 for true
                       "FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,"
                       "FOREIGN KEY (template_id) REFERENCES WorkoutTemplates(id) ON DELETE CASCADE"
                       ");");
@@ -88,7 +93,7 @@ bool createTables(){
             db.rollback();
         }
     }
-    // Exercise Workouts Table
+    // Exercise Workout Table
     if (creation_success){
         query.prepare("CREATE TABLE IF NOT EXISTS ExerciseWorkouts ("
                       "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -117,6 +122,7 @@ bool createTables(){
                       "duration INTEGER DEFAULT 0," // in seconds
                       "1RM REAL DEFAULT 0," // one rep max
                       "volume REAL DEFAULT 0," // in kg
+                      "performed BOOLEAN DEFAULT 0," // 0 for false, 1 for true
                       "user_id INTEGER NOT NULL," // user who performed the set
                       "workout_id INTEGER NOT NULL," // workout where the set was performed
                       "exercise_workout_id INTEGER NOT NULL," // exercise where the set was performed
@@ -154,10 +160,31 @@ bool createTables(){
             db.rollback();
         }
     }
+    // Muscles Table
+    if (creation_success){
+        query.prepare("CREATE TABLE IF NOT EXISTS Muscles ("
+                      "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                      "name TEXT UNIQUE NOT NULL"
+                      ");");
+        if (!query.exec()){
+            creation_success = false;
+            db.rollback();
+        }
+    }
+    // Equipments Table
+    if (creation_success){
+        query.prepare("CREATE TABLE IF NOT EXISTS Equipments ("
+                      "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                      "name TEXT UNIQUE NOT NULL"
+                      ");");
+        if (!query.exec()){
+            creation_success = false;
+            db.rollback();
+        }
+    }
 
     db.close();
     return creation_success;
-
 }
 
 

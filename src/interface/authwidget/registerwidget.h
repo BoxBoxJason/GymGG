@@ -9,7 +9,6 @@ class RegisterWidget : public QWidget {
 
     public:
     explicit RegisterWidget(QWidget *parent = nullptr);
-    void clean();
 
     private:
     QLineEdit* username;
@@ -20,6 +19,8 @@ class RegisterWidget : public QWidget {
     signals:
     void register_success(const QString& user_id);
     void change_parent_page();
+    void clean();
+
 };
 
 #endif // INTERFACE_AUTHWIDGET_REGISTERWIDGET_H

@@ -9,13 +9,16 @@ class ProfileBadgeWidget : public QWidget {
 
     public:
     explicit ProfileBadgeWidget(QWidget *parent = nullptr);
-    void setUser(const QString& username, const QString& avatar_path, int training_counter);
-    void clean();
 
     private:
     QLabel* username_label;
     QLabel* training_counter_label;
     QLabel* user_avatar_label;
+
+    public slots:
+    void clean();
+    void setUser(const QString& username, const QString& avatar_path, int training_counter);
+
 };
 
 #endif // INTERFACE_PROFILEWIDGET_PROFILEBADGEWIDGET_H

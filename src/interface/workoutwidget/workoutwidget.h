@@ -9,10 +9,11 @@ class WorkoutWidget : public QWidget
 
     public:
     explicit WorkoutWidget(QWidget *parent = nullptr);
-    void clean();
 
     signals:
     void change_parent_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_WORKOUTWIDGET_WORKOUTWIDGET_H

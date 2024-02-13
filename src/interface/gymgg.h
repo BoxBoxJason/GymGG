@@ -9,13 +9,14 @@ class GymGG : public QMainWindow {
 
     public:
     explicit GymGG(QWidget *parent = nullptr);
-    void clean();
 
     private:
     PagesManager* pages_manager;
 
     public slots:
     void change_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_GYMGG_H

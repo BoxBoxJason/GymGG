@@ -9,10 +9,11 @@ class WorkoutTemplatesWidget : public QWidget
     Q_OBJECT
 public:
     explicit WorkoutTemplatesWidget(QWidget *parent = nullptr);
-    void clean();
 
     signals:
     void change_parent_page(int index);
+    void clean();
+
 };
 
 #endif // INTERFACE_WORKOUTTEMPLATESWIDGET_WORKOUTTEMPLATESWIDGET_H
