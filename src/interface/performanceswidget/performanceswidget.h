@@ -2,6 +2,7 @@
 #define INTERFACE_PERFORMANCESWIDGET_PERFORMANCESWIDGET_H
 
 #include <QWidget>
+#include <QJsonObject>
 
 class PerformancesWidget : public QWidget {
     Q_OBJECT
@@ -11,6 +12,9 @@ class PerformancesWidget : public QWidget {
 
     signals:
     void change_parent_page(int index);
+
+    public slots:
+    void setUser(QJsonObject& user);
     void clean();
 
 };

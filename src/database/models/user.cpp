@@ -3,7 +3,7 @@
 #include "general.h"
 #include "../controllers/user.h"
 
-int createUser(const QString& username, const QString& email, const QString& password, const QDate& birthdate, const QString& gender){
+int createUser(const QString& username, const QString& email, const QString& password){
     QString salt = generateSalt();
     QString hashed_password = hashPassword(password,salt);
 
@@ -11,8 +11,6 @@ int createUser(const QString& username, const QString& email, const QString& pas
         {"username",username},
         {"email",email},
         {"password",hashed_password},
-        {"birthdate",birthdate},
-        {"gender",gender},
         {"salt",salt},
         {"created_at",QDateTime::currentDateTime()}
         }));

@@ -19,12 +19,12 @@ class ProfileWidget : public QWidget {
     TrainingsCounterWidget* trainings_counter_widget;
 
     public slots:
-    void change_page(int index);
-    void set_player(const QString& player_id);
+    void changePage(int index);
+    void setUser(QJsonObject& user);
     void clean();
 
     signals:
-    void change_parent_page(int index);
+    void changeParentPage(int index);
 
 };
 

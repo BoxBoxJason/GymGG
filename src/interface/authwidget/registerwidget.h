@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include "../errorwidget/errorlabel.h"
 
 class RegisterWidget : public QWidget {
     Q_OBJECT
@@ -11,15 +12,18 @@ class RegisterWidget : public QWidget {
     explicit RegisterWidget(QWidget *parent = nullptr);
 
     private:
-    QLineEdit* username;
-    QLineEdit* email;
-    QLineEdit* password;
-    QLineEdit* password_confirm;
+    QLineEdit* username_input;
+    QLineEdit* email_input;
+    QLineEdit* password_input;
+    QLineEdit* password_confirm_input;
+    ErrorLabel* error_label;
+    void registerUser();
+
+    public slots:
+    void clean();
 
     signals:
-    void register_success(const QString& user_id);
-    void change_parent_page();
-    void clean();
+    void registerSuccess(int user_id);
 
 };
 

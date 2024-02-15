@@ -2,7 +2,7 @@
 #define INTERFACE_WORKOUTTEMPLATESWIDGET_WORKOUTTEMPLATESWIDGET_H
 
 #include <QWidget>
-
+#include <QJsonObject>
 
 class WorkoutTemplatesWidget : public QWidget
 {
@@ -12,6 +12,9 @@ public:
 
     signals:
     void change_parent_page(int index);
+
+    public slots:
+    void setUser(QJsonObject& user);
     void clean();
 
 };

@@ -14,7 +14,7 @@
     * \param password The password of the user
     * \param birthdate The birthdate of the user
 */
-int createUser(const QString& username, const QString& email, const QString& password, const QDate& birthdate, const QString& gender);
+int createUser(const QString& username, const QString& email, const QString& password);
 
 // ===== PUT FUNCTIONS ===== //
 /*!

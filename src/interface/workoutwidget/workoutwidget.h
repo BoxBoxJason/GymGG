@@ -2,6 +2,7 @@
 #define INTERFACE_WORKOUTWIDGET_WORKOUTWIDGET_H
 
 #include <QWidget>
+#include <QJsonObject>
 
 class WorkoutWidget : public QWidget
 {
@@ -12,7 +13,11 @@ class WorkoutWidget : public QWidget
 
     signals:
     void change_parent_page(int index);
+
+    public slots:
+    void setWorkout(QJsonObject& workout);
     void clean();
+    void setUser(QJsonObject& user);
 
 };
 

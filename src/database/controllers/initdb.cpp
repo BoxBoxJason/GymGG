@@ -27,10 +27,10 @@ bool createTables(){
                   "email TEXT UNIQUE NOT NULL,"
                   "password TEXT NOT NULL,"
                   "salt TEXT NOT NULL," // for password hashing
-                  "birthdate DATE NOT NULL,"
+                  "birthdate DATE,"
                   "weights TEXT DEFAULT '{}'," // stringified json object {created_at: weight (kg)}
                   "height INTEGER," // in cm
-                  "gender TEXT NOT NULL,"
+                  "gender TEXT DEFAULT 'unspecified',"
                   "goal TEXT DEFAULT 'unspecified'," // custom or default value
                   "created_at DATETIME NOT NULL"
                   ");");
@@ -121,6 +121,7 @@ bool createTables(){
                       "weight REAL DEFAULT 0," // in kg
                       "duration INTEGER DEFAULT 0," // in seconds
                       "1RM REAL DEFAULT 0," // one rep max
+                      "RPE REAL DEFAULT 0," // rate of perceived exertion
                       "volume REAL DEFAULT 0," // in kg
                       "performed BOOLEAN DEFAULT 0," // 0 for false, 1 for true
                       "user_id INTEGER NOT NULL," // user who performed the set

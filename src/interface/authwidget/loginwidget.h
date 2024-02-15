@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLineEdit>
 #include <QString>
+#include "../errorwidget/errorlabel.h"
 
 class LoginWidget : public QWidget {
     Q_OBJECT
@@ -12,15 +13,16 @@ class LoginWidget : public QWidget {
     explicit LoginWidget(QWidget *parent = nullptr);
 
     private:
+    QLineEdit* username_or_email_input;
+    QLineEdit* password_input;
+    ErrorLabel* error_label;
+    void login();
 
-    
-    QLineEdit* username_or_email;
-    QLineEdit* password;
+    public slots:
+    void clean();
 
     signals:
-    void login_success(const QString& user_id);
-    void change_parent_page();
-    void clean();
+    void loginSuccess(int user_id);
 
 };
 

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "pagesmanager.h"
+#include "navbarwidget/navbarwidget.h"
 
 class GymGG : public QMainWindow {
     Q_OBJECT
@@ -12,10 +13,7 @@ class GymGG : public QMainWindow {
 
     private:
     PagesManager* pages_manager;
-
-    public slots:
-    void change_page(int index);
-    void clean();
+    NavBarWidget* navbar;
 
 };
 

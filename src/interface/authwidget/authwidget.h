@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QStackedLayout>
+#include <QJsonObject>
+#include <QPushButton>
 #include "loginwidget.h"
 #include "registerwidget.h"
 
@@ -16,14 +18,16 @@ class AuthWidget : public QWidget {
     QStackedLayout* stacked_layout;
     LoginWidget* login_widget;
     RegisterWidget* register_widget;
+    QPushButton* register_switch_button;
+    QPushButton* login_switch_button;
 
     public slots:
-    void authentified(const QString& user_id);
-    void change_page();
+    void changePage();
+    void authentified(int user_id);
+    void clean();
 
     signals:
-    void change_parent_page(int index);
-    void clean();
+    void setUser(QJsonObject& user,bool go_to_profile);
 
 };
 

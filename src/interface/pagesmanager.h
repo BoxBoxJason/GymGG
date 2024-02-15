@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QStackedLayout>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "authwidget/authwidget.h"
 #include "profilewidget/profilewidget.h"
 #include "historywidget/historywidget.h"
@@ -30,6 +32,12 @@ class PagesManager : public QWidget {
     public slots:
     void change_page(int index);
     void clean();
+    void setUser(QJsonObject& user, bool go_to_profile=false);
+    void setWorkout(QJsonObject& workout, bool go_to_workout=false);
+    void setExercise(QJsonObject& exercise, bool go_to_exercises=true);
+    void setExercises(QJsonArray& exercises=QJsonArray(),bool show_exercises=false);
+    void showErrorMessage(const QString& message);
+    void showSuccessMessage(const QString& message);
 
 };
 
